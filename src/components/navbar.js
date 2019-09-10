@@ -12,50 +12,48 @@ const Navbar = () => {
   const [current10, setCurrent10] = useState([]);
   //const [dummy, setdummy] = useState(0);
 
-  useEffect(() => {
-    async function callGithub() {
-      try {
-        const generateLanguagePromise = language =>
-          axios.get(
-            `https://api.github.com/search/repositories?q=stars:>1+language:${language}&sort=stars&order=desc&type=Repositories`
+  useEffect(
+    () => {
+      async function callGithub() {
+        try {
+          const generateLanguagePromise = language =>
+            axios.get(
+              `https://api.github.com/search/repositories?q=stars:>1+language:${language}&sort=stars&order=desc&type=Repositories`
+            );
+          const arrayOfPromises = languages.map(currentLanguage =>
+            generateLanguagePromise(currentLanguage)
           );
-        const arrayOfPromises = languages.map(currentLanguage =>
-          generateLanguagePromise(currentLanguage)
-        );
-        const resolvedData = await Promise.all(arrayOfPromises);
-        console.log(resolvedData);
-        setRepos(resolvedData);
-
-        const result = resolvedData.filter(item => {
-          console.log(item, "item");
-          return (
-            item.config.url ===
-            `https://api.github.com/search/repositories?q=stars:>1+language:${language}&sort=stars&order=desc&type=Repositories`
-          );
-        });
-        console.log(result);
-        // .data.items.slice(0, 10)
-      } catch (error) {
-        console.log(error);
+          const resolvedData = await Promise.all(arrayOfPromises);
+          setRepos(resolvedData);
+          const result = resolvedData.filter(item => {
+            return (
+              item.config.url ===
+              `https://api.github.com/search/repositories?q=stars:>1+language:All&sort=stars&order=desc&type=Repositories`
+            );
+          });
+          setCurrent10(result[0].data.items.slice(0, 10));
+        } catch (error) {
+          console.log(error);
+        }
       }
-    }
-    callGithub();
+      callGithub();
 
-    setLoading(false);
-  }, []);
+      setLoading(false);
+    },
+    // eslint-disable-next-line
+    []
+  );
 
-  // useEffect(() => {
-  //   setCurrent10(
-  //     repos
-  //       .filter(
-  //         item =>
-  //           item.config.url ===
-  //           `https://api.github.com/search/repositories?q=stars:>1+language:${language}&sort=stars&order=desc&type=Repositories`
-  //       )
-  //       .data.items.slice(0, 10)
-  //   );
-  //   console.log(current10);
-  // }, [language]);
+  function handleLangaugeChange(language) {
+    setLanguage(language);
+    const result = repos.filter(item => {
+      return (
+        item.config.url ===
+        `https://api.github.com/search/repositories?q=stars:>1+language:${language}&sort=stars&order=desc&type=Repositories`
+      );
+    });
+    setCurrent10(result[0].data.items.slice(0, 10));
+  }
 
   return (
     <>
@@ -70,7 +68,7 @@ const Navbar = () => {
               style={{ color: "purple" }}
               key={index}
               value={lang}
-              onClick={() => setLanguage(lang)}
+              onClick={() => handleLangaugeChange(lang)}
             >
               {lang}
             </button>
