@@ -10,7 +10,6 @@ const Navbar = () => {
   const [loading, setLoading] = useState(true);
   const [repos, setRepos] = useState([]);
   const [current10, setCurrent10] = useState([]);
-  //const [dummy, setdummy] = useState(0);
 
   useEffect(
     () => {
@@ -37,7 +36,6 @@ const Navbar = () => {
         }
       }
       callGithub();
-
       setLoading(false);
     },
     // eslint-disable-next-line
